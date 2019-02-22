@@ -1,0 +1,32 @@
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+int main()
+{
+    char *command;
+    char *p;
+    char *command_array[100];
+    int counter = 0;
+    
+    cout<<"Minishell>";
+    cin >> command;
+    
+    p=strtok(command, " ");
+
+    while(p&&strcmp(p,"|")!=0){
+
+        command_array[counter]=p;
+
+        counter++;
+
+        p=strtok(NULL," ");
+
+    }
+   
+    printf("%s , %s", command_array[0], command_array[1]);
+
+
+    return 0;
+}
