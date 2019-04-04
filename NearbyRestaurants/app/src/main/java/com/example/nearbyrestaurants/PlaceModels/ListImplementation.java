@@ -26,6 +26,23 @@ public class ListImplementation implements PlaceDataList {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public List<PlaceData> getPlaces() {
+        return restaurantList;
+    }
+
+    @Override
+    public List<PlaceData> sortDistance(){
+        restaurantList.sort(new Comparator<PlaceData>() {
+            @Override
+            public int compare(PlaceData o1, PlaceData o2) {
+                if(o1.getDistance() > o2.getDistance()){return 1;}
+                if(o1.getDistance() < o2.getDistance()){return -1;}
+                return 0;
+            }
+        });
+        return restaurantList;
+    }
+    @Override
+    public List<PlaceData> sortRating(){
         restaurantList.sort(new Comparator<PlaceData>() {
             @Override
             public int compare(PlaceData o1, PlaceData o2) {
@@ -36,7 +53,6 @@ public class ListImplementation implements PlaceDataList {
         });
         return restaurantList;
     }
-
     @Override
     public void addPlace(PlaceData newPlace) {
         restaurantList.add(newPlace);

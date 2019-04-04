@@ -13,6 +13,5 @@ public final class AppConfiguration {
     public static final String LATITUDE = "lat";
     public static final String LONGITUDE = "lng";
     public static final String VICINITY = "vicinity";
-    public static final String DISTANCE = "distance";
     public static final int PROXIMITY_RADIUS = 2000;
 }

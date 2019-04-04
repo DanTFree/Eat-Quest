@@ -41,7 +41,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
 
 import static com.example.nearbyrestaurants.AppConfiguration.GEOMETRY;
 import static com.example.nearbyrestaurants.AppConfiguration.LATITUDE;
@@ -54,7 +53,6 @@ import static com.example.nearbyrestaurants.AppConfiguration.PROXIMITY_RADIUS;
 import static com.example.nearbyrestaurants.AppConfiguration.RATING;
 import static com.example.nearbyrestaurants.AppConfiguration.STATUS;
 import static com.example.nearbyrestaurants.AppConfiguration.VICINITY;
-import static com.example.nearbyrestaurants.AppConfiguration.DISTANCE;
 import static com.example.nearbyrestaurants.AppConfiguration.ZERO_RESULTS;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
@@ -254,7 +252,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (result.getString(STATUS).equalsIgnoreCase(OK)) {
 
                 mMap.clear();
-
+                if(!restaurants.getPlaces().isEmpty()){
+                    restaurants.getPlaces().clear();
+                }
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
 
@@ -267,9 +267,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     if (!place.isNull(VICINITY)) {
                         placeAddress = place.getString(VICINITY);
-                    }
-                    if (!place.isNull(DISTANCE)) {
-                        placeDistance = place.getDouble(DISTANCE);
                     }
 
                     latitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LATITUDE);
