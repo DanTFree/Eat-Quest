@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Eatquest3</string>
+    <string name="food_prompt">Choose Food Types</string>
+
+    <string-array name="Foods_arrays">
+        <item>Mexican</item>
+        <item>Chinese</item>
+        <item>American</item>
+        <item>Italian</item>
+        <item>Vietnamese</item>
+    </string-array>
+
+    <string-array name="distance_arrays">
+        <item>1 mile</item>
+        <item>2 miles</item>
+        <item>3 miles</item>
+        <item>4 miles</item>
+        <item>5 miles</item>
+    </string-array>
+
+    <string-array name="price_arrays">
+        <item>$ (cheap)</item>
+        <item>$$ (medium)</item>
+        <item>$$$ (expensive)</item>
+    </string-array>
+
+</resources>
