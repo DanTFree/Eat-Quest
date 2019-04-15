@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-<<<<<<< HEAD
 
 import android.widget.AdapterView;
 import android.widget.TextView;
@@ -29,28 +28,13 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
 
     public RecyclerViewAdapter() {
 
-=======
-import android.widget.TextView;
-
-import com.example.nearbyrestaurants.PlaceModels.PlaceDataList;
-import com.example.nearbyrestaurants.PlaceModels.ListImplementation;
-
-class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    private final PlaceDataList restaurants;
-
-    public RecyclerViewAdapter() {
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
         restaurants = ListImplementation.sharedInstance();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, final int i) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list, parent, false);
-<<<<<<< HEAD
         final ViewHolder holder = new ViewHolder(view, mListener);
-=======
-        final ViewHolder holder = new ViewHolder(view);
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
         return holder;
     }
 
@@ -59,41 +43,23 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
         try {
             String rating = String.valueOf(restaurants.getPlaces().get(position).getRating());
             holder.RestaurantName.setText(restaurants.getPlaces().get(position).getName());
-            holder.RestaurantAddress.setText(restaurants.getPlaces().get(position).getAddress());
-<<<<<<< HEAD
             String distance = String.format("%.2f", restaurants.getPlaces().get(position).getDistance());
             holder.RestaurantRating.setText("Rating " + rating + "/5");
             holder.RestaurantDistance.setText(distance + " Miles");
-=======
-            holder.RestaurantRating.setText("Rating " + rating + "/5");
-
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
         } catch (NullPointerException e) {
         }
     }
 
-<<<<<<< HEAD
     public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView RestaurantName;
         TextView RestaurantRating;
-        TextView RestaurantAddress;
         TextView RestaurantDistance;
 
 
         public ViewHolder(View itemView, final OnItemClickListener listener) {
-=======
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView RestaurantName;
-        TextView RestaurantRating;
-        TextView RestaurantAddress;
-
-        public ViewHolder(View itemView) {
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
             super(itemView);
             RestaurantName = (TextView) itemView.findViewById(R.id.restaurantName);
             RestaurantRating = (TextView) itemView.findViewById(R.id.restaurant_rating);
-            RestaurantAddress = (TextView) itemView.findViewById(R.id.restaurant_address);
-<<<<<<< HEAD
             RestaurantDistance = (TextView) itemView.findViewById(R.id.restaurant_distance);
 
             itemView.setOnClickListener(new View.OnClickListener(){
@@ -107,8 +73,6 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
                     }
                 }
             });
-=======
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
         }
     }
 

@@ -25,11 +25,7 @@
                 android:layout_alignRight="@+id/restaurant_image"
                 android:orientation="vertical"
                 android:paddingLeft="10dp"
-<<<<<<< HEAD
                 android:paddingTop="10dp">
-=======
-                android:paddingTop="15dp">
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
 
                 <TextView
                     android:id="@+id/restaurantName"
@@ -37,42 +33,23 @@
                     android:layout_height="25dp"
                     android:text="Restaurant Name"
                     android:textColor="#000"
-<<<<<<< HEAD
-                    android:textSize="15sp"
-=======
-                    android:textSize="18sp"
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
+                    android:textSize="21sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/restaurant_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-<<<<<<< HEAD
                     android:text="Rating"
-                    android:textSize="13sp" />
+                    android:textSize="19sp" />
 
                 <TextView
                     android:id="@+id/restaurant_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Miles"
-                    android:textSize="13sp" />
-=======
-                    android:text="Rating 4/5"
-                    android:textSize="16sp" />
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
+                    android:textSize="19sp" />
 
-                <TextView
-                    android:id="@+id/restaurant_address"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-<<<<<<< HEAD
-                    android:text="Address"
-                    android:textSize="13sp" />
-=======
-                    android:textSize="16sp" />
->>>>>>> c14a2bea848367d7ff4972148f8c7bb34f28c94f
 
             </LinearLayout>
 

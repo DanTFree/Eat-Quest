@@ -1,8 +1,10 @@
 package com.example.nearbyrestaurants;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -11,21 +13,21 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.nearbyrestaurants.PlaceModels.ListImplementation;
 import com.example.nearbyrestaurants.PlaceModels.PlaceDataList;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import static com.example.nearbyrestaurants.AppConfiguration.OK;
 import static com.example.nearbyrestaurants.AppConfiguration.STATUS;
-import static com.example.nearbyrestaurants.AppConfiguration.PHONE;
-import static com.example.nearbyrestaurants.AppConfiguration.ZERO_RESULTS;
 
 public class InfoActivity extends AppCompatActivity {
     public PlaceDataList restaurants;
     String iPosition= "hello";
     TextView restName, restAdd, restPhone;
-
+    ImageView restPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,19 +85,47 @@ public class InfoActivity extends AppCompatActivity {
 
     private void jsonParse(JSONObject result) {
         String phoneNumber = "N/A";
-
+        String photoRef = "N/A";
         try {
+
 
             JSONObject jObj = result.getJSONObject("result");
             if (result.getString(STATUS).equalsIgnoreCase(OK)) {
+                if(!jObj.isNull("formatted_phone_number")) {
+                    phoneNumber = jObj.getString("formatted_phone_number");
+                    restPhone = (TextView) findViewById(R.id.rest_phone);
+                    restPhone.setText(phoneNumber);
+                }
+                JSONArray jPhotoArray = jObj.getJSONArray("photos");
+                JSONObject jPhoto = jPhotoArray.getJSONObject(0);
+                    photoRef = jPhoto.getString("photo_reference");
+                    //https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&maxheight=100&photoreference=[ref]&key=AIzaSyCEpLRjoupchPtJoXt9Wd50OXWRtkQ4Fgk
+                    StringBuilder picture = new StringBuilder("https://maps.googleapis.com/maps/api/place/photo?");
+                    picture.append("maxwidth=1500&maxheight=1000");
+                    picture.append("&photoreference=" + photoRef);
+                    picture.append("&key=AIzaSyCEpLRjoupchPtJoXt9Wd50OXWRtkQ4Fgk");
+                    System.out.println(photoRef);
+                    restPhoto = (ImageView) findViewById(R.id.rest_photo);
+                    loadImageFromWeb(picture.toString());
 
-                phoneNumber = jObj.getString("formatted_phone_number");
-
-                restPhone = (TextView) findViewById(R.id.rest_phone);
-                restPhone.setText(phoneNumber);
             }
         }catch(JSONException e){
             e.printStackTrace();
         }
+    }
+    public void loadImageFromWeb(String url){
+        Picasso.with(InfoActivity.this).load(url).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(restPhoto, new com.squareup.picasso.Callback() {
+
+            @Override
+            public void onSuccess() {
+                //do smth when picture is loaded successfully
+
+            }
+
+            @Override
+            public void onError() {
+                //do smth when there is picture loading error
+            }
+        });
     }
 }
