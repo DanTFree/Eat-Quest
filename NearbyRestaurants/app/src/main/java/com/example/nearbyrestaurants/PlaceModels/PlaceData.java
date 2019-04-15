@@ -27,8 +27,12 @@ public class PlaceData {
         return latLng;
     }
 
-    public double getDistance(){
+    public double getDistance() {
         return distance;
+    }
+
+    public String getID(){
+        return id;
     }
 
     public PlaceData(String name, String address, String id, double rating, LatLng latLng, double distance) {

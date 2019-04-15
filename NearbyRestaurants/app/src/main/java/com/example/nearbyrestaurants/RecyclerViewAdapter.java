@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 
@@ -15,7 +16,15 @@ import com.example.nearbyrestaurants.PlaceModels.ListImplementation;
 
 class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private final PlaceDataList restaurants;
+    private OnItemClickListener mListener;
 
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mListener = listener;
+    }
 
     public RecyclerViewAdapter() {
 
@@ -25,7 +34,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, final int i) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list, parent, false);
-        final ViewHolder holder = new ViewHolder(view);
+        final ViewHolder holder = new ViewHolder(view, mListener);
         return holder;
     }
 
@@ -42,20 +51,31 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
         }
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView RestaurantName;
         TextView RestaurantRating;
         TextView RestaurantAddress;
         TextView RestaurantDistance;
 
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, final OnItemClickListener listener) {
             super(itemView);
             RestaurantName = (TextView) itemView.findViewById(R.id.restaurantName);
             RestaurantRating = (TextView) itemView.findViewById(R.id.restaurant_rating);
             RestaurantAddress = (TextView) itemView.findViewById(R.id.restaurant_address);
             RestaurantDistance = (TextView) itemView.findViewById(R.id.restaurant_distance);
 
+            itemView.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if(position != RecyclerView.NO_POSITION){
+                            listener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
     }
 

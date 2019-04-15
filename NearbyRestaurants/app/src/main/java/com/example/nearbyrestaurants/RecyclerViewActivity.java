@@ -1,5 +1,6 @@
 package com.example.nearbyrestaurants;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,8 +12,8 @@ import com.example.nearbyrestaurants.PlaceModels.ListImplementation;
 import com.example.nearbyrestaurants.PlaceModels.PlaceDataList;
 
 public class RecyclerViewActivity extends AppCompatActivity {
-    Button ratingSortButton;
-    Button distanceSortButton;
+    private Button ratingSortButton;
+    private Button distanceSortButton;
     public PlaceDataList restaurants;
 
     @Override
@@ -57,6 +58,14 @@ public class RecyclerViewActivity extends AppCompatActivity {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter();
         myRecycler.setAdapter(adapter);
         myRecycler.setLayoutManager(new LinearLayoutManager(this));
+        adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(getBaseContext(), InfoActivity.class);
+                intent.putExtra("itemPosition", position);
+                startActivity(intent);
+            }
+        });
     }
     private void sortByDistance(){
         restaurants.sortDistance();
@@ -64,5 +73,13 @@ public class RecyclerViewActivity extends AppCompatActivity {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter();
         myRecycler.setAdapter(adapter);
         myRecycler.setLayoutManager(new LinearLayoutManager(this));
+        adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(getBaseContext(), InfoActivity.class);
+                intent.putExtra("itemPosition", position);
+                startActivity(intent);
+            }
+        });
     }
 }

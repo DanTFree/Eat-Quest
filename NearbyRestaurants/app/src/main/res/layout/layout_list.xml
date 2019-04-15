@@ -40,19 +40,21 @@
                     android:id="@+id/restaurant_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rating 4/5"
+                    android:text="Rating"
                     android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/restaurant_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="Miles"
                     android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/restaurant_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="Address"
                     android:textSize="13sp" />
 
             </LinearLayout>

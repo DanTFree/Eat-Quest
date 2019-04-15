@@ -41,6 +41,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.util.List;
 
 import static com.example.nearbyrestaurants.AppConfiguration.GEOMETRY;
 import static com.example.nearbyrestaurants.AppConfiguration.LATITUDE;
@@ -49,11 +51,11 @@ import static com.example.nearbyrestaurants.AppConfiguration.LONGITUDE;
 import static com.example.nearbyrestaurants.AppConfiguration.NAME;
 import static com.example.nearbyrestaurants.AppConfiguration.OK;
 import static com.example.nearbyrestaurants.AppConfiguration.PLACE_ID;
-import static com.example.nearbyrestaurants.AppConfiguration.PROXIMITY_RADIUS;
 import static com.example.nearbyrestaurants.AppConfiguration.RATING;
 import static com.example.nearbyrestaurants.AppConfiguration.STATUS;
 import static com.example.nearbyrestaurants.AppConfiguration.VICINITY;
 import static com.example.nearbyrestaurants.AppConfiguration.ZERO_RESULTS;
+//import static com.example.nearbyrestaurants.AppConfiguration.PHOTO;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 123;
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private PlaceData mPlace;
     private LatLng currentlatlng;
     public PlaceDataList restaurants;
+    private int PROXIMITY_RADIUS = 1600;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void parseLocationResult(JSONObject result) {
         String place_id, placeAddress = "", placeName = null;
-        double placeRating = 0, placeDistance ;
+        double placeRating = 0, placeDistance;
         double latitude, longitude;
 
         try {
@@ -252,13 +255,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (result.getString(STATUS).equalsIgnoreCase(OK)) {
 
                 mMap.clear();
-                if(!restaurants.getPlaces().isEmpty()){
+                if (!restaurants.getPlaces().isEmpty()) {
                     restaurants.getPlaces().clear();
                 }
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
 
                     place_id = place.getString(PLACE_ID);
+
                     if (!place.isNull(NAME)) {
                         placeName = place.getString(NAME);
                     }
@@ -273,15 +277,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     longitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LONGITUDE);
                     LatLng latLng = new LatLng(latitude, longitude);
                     double R = 6371; // Radius of the earth in km
-                    double dLat = (latitude - currentlatlng.latitude)* (Math.PI/180);
-                    double dLon = (longitude- currentlatlng.longitude) * (Math.PI/180);
+                    double dLat = (latitude - currentlatlng.latitude) * (Math.PI / 180);
+                    double dLon = (longitude - currentlatlng.longitude) * (Math.PI / 180);
                     double a =
-                            Math.sin(dLat/2) * Math.sin(dLat/2) +
-                                    Math.cos(latitude*(Math.PI/180)) * Math.cos(currentlatlng.latitude*(Math.PI/180)) *
-                                            Math.sin(dLon/2) * Math.sin(dLon/2)
-                            ;
-                    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                    placeDistance = R * c; // Distance in km
+                            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                    Math.cos(latitude * (Math.PI / 180)) * Math.cos(currentlatlng.latitude * (Math.PI / 180)) *
+                                            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    placeDistance = (R * c) / 1.609344; // Distance in km
+
                     PlaceData places = new PlaceData(placeName, placeAddress, place_id, placeRating, latLng, placeDistance);
                     restaurants.addPlace(places);
 
@@ -304,4 +308,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
     }
+
 }
