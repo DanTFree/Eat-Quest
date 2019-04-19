@@ -54,7 +54,7 @@ import static com.example.nearbyrestaurants.AppConfiguration.STATUS;
 import static com.example.nearbyrestaurants.AppConfiguration.VICINITY;
 import static com.example.nearbyrestaurants.AppConfiguration.ZERO_RESULTS;
 import static com.example.nearbyrestaurants.AppConfiguration.PRICE;
-//import static com.example.nearbyrestaurants.AppConfiguration.LOCATION_BIAS;
+import static com.example.nearbyrestaurants.AppConfiguration.LOCATION_BIAS;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int PROXIMITY_RADIUS = 1600;
     public int DIST;
     public int cost;
-    //private String placelocationbias;
+    private String placelocationbias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -363,6 +363,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     if (!place.isNull(VICINITY)) {
                         placeAddress = place.getString(VICINITY);
+                    }
+                    if (!place.isNull(LOCATION_BIAS)){
+                        placeLocationBias = place.getString(LOCATION_BIAS);
                     }
 
                     latitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LATITUDE);

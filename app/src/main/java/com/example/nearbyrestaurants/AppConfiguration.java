@@ -16,7 +16,7 @@ public final class AppConfiguration {
     public static final String PHONE = "formatted_phone_number";
     public static final String PHOTO = "photo";
     public static final String PRICE = "price_level";
-   // public static final String LOCATION_BIAS = "locationbias";
+    public static final String LOCATION_BIAS = "locationbias";
 
     //public static final int PROXIMITY_RADIUS = 2000;
 }

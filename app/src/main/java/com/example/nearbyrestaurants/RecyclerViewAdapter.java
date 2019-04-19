@@ -42,13 +42,13 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
         try {
             String rating = String.valueOf(restaurants.getPlaces().get(position).getRating());
             String price = String.valueOf(restaurants.getPlaces().get(position).getPrice());
-           // String location = String.valueOf(restaurants.getPlaces().get(position).getLocation());
+            String locationbias = String.valueOf(restaurants.getPlaces().get(position).getLocationbias());
             holder.RestaurantName.setText(restaurants.getPlaces().get(position).getName());
             String distance = String.format("%.2f", restaurants.getPlaces().get(position).getDistance());
             holder.RestaurantRating.setText("Rating " + rating + "/5");
             holder.RestaurantDistance.setText(distance + " Miles");
             holder.RestaurantPrice.setText("price " + price);
-          //  holder.RestaurantLocationBias.setText("locationbias " + location);
+            holder.RestaurantLocationBias.setText("locationbias " + locationbias);
 
 
         } catch (NullPointerException e) {
@@ -60,7 +60,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
         TextView RestaurantRating;
         TextView RestaurantDistance;
         TextView RestaurantPrice;
-     //   TextView RestaurantLocationBias;
+        TextView RestaurantLocationBias;
 
 
 
@@ -70,7 +70,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
             RestaurantRating = (TextView) itemView.findViewById(R.id.restaurant_rating);
             RestaurantDistance = (TextView) itemView.findViewById(R.id.restaurant_distance);
             RestaurantPrice = (TextView) itemView.findViewById(R.id.restaurant_price);
-         //   RestaurantLocationBias = (TextView) itemView.findViewById(R.id.restaurant_locationbias);
+            RestaurantLocationBias = (TextView) itemView.findViewById(R.id.restaurant_locationbias);
 
 
             itemView.setOnClickListener(new View.OnClickListener(){
