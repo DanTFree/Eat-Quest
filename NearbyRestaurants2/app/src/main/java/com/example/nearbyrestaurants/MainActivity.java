@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -33,6 +34,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +44,8 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.SocketTimeoutException;
 
 import static com.example.nearbyrestaurants.AppConfiguration.GEOMETRY;
 import static com.example.nearbyrestaurants.AppConfiguration.LATITUDE;
@@ -54,13 +59,12 @@ import static com.example.nearbyrestaurants.AppConfiguration.STATUS;
 import static com.example.nearbyrestaurants.AppConfiguration.VICINITY;
 import static com.example.nearbyrestaurants.AppConfiguration.ZERO_RESULTS;
 import static com.example.nearbyrestaurants.AppConfiguration.PRICE;
-import static com.example.nearbyrestaurants.AppConfiguration.LOCATION_BIAS;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 123;
     private static final float DEFAULT_ZOOM = 15f;
-    private static final float SHOWING_RESTAURANTS_ZOOM = 14f;
+    public float SHOWING_RESTAURANTS_ZOOM = 14f;
     private boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GoogleMap mMap;
@@ -69,10 +73,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private PlaceData mPlace;
     private LatLng currentlatlng;
     public PlaceDataList restaurants;
-    private int PROXIMITY_RADIUS = 1600;
-    public int DIST;
+    public int PROXIMITY_RADIUS = 1609;
     public int cost;
-    private String placelocationbias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,87 +89,86 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         switch(data){
             case ("1 mile1 (Inexpensive)"):
-                DIST = 1;
+                PROXIMITY_RADIUS = 1609;
                 cost = 1;
                 break;
             case ("2 miles1 (Inexpensive)"):
-                DIST = 2;
+                PROXIMITY_RADIUS = 3219;
                 cost = 1;
                 break;
             case ("3 miles1 (Inexpensive)"):
-                DIST = 3;
+                PROXIMITY_RADIUS = 4828;
                 cost = 1;
                 break;
             case ("4 miles1 (Inexpensive)"):
-                DIST = 4;
+                PROXIMITY_RADIUS = 6437;
                 cost = 1;
                 break;
             case ("5 miles1 (Inexpensive)"):
-                DIST = 5;
+                PROXIMITY_RADIUS = 8047;
                 cost = 1;
                 break;
             case ("1 mile2 (Moderate)"):
-                DIST = 1;
+                PROXIMITY_RADIUS = 1609;
                 cost = 2;
                 break;
             case ("2 miles2 (Moderate)"):
-                DIST = 2;
+                PROXIMITY_RADIUS = 3219;
                 cost = 2;
                 break;
             case ("3 miles2 (Moderate)"):
-                DIST = 3;
+                PROXIMITY_RADIUS = 4828;
                 cost = 2;
                 break;
             case ("4 miles2 (Moderate)"):
-                DIST = 4;
+                PROXIMITY_RADIUS = 6437;
                 cost = 2;
                 break;
             case ("5 miles2 (Moderate)"):
-                DIST = 5;
+                PROXIMITY_RADIUS = 8047;
                 cost = 2;
                 break;
             case ("1 mile3 (Expensive)"):
-                DIST = 1;
+                PROXIMITY_RADIUS = 1609;
                 cost = 3;
                 break;
             case ("2 miles3 (Expensive)"):
-                DIST = 2;
+                PROXIMITY_RADIUS = 3219;
                 cost = 3;
                 break;
             case ("3 miles3 (Expensive)"):
-                DIST = 3;
+                PROXIMITY_RADIUS = 4828;
                 cost = 3;
                 break;
             case ("4 miles3 (Expensive)"):
-                DIST = 4;
+                PROXIMITY_RADIUS = 6437;
                 cost = 3;
                 break;
             case ("5 miles3 (Expensive)"):
-                DIST = 5;
+                PROXIMITY_RADIUS = 8047;
                 cost = 3;
                 break;
             case ("1 mile4 (Very Expensive)"):
-                DIST = 1;
+                PROXIMITY_RADIUS = 1609;
                 cost = 4;
                 break;
             case ("2 miles4 (Very Expensive)"):
-                DIST = 2;
+                PROXIMITY_RADIUS = 3219;
                 cost = 4;
                 break;
             case ("3 miles4 (Very Expensive)"):
-                DIST = 3;
+                PROXIMITY_RADIUS = 4828;
                 cost = 4;
                 break;
             case ("4 miles4 (Very Expensive)"):
-                DIST = 4;
+                PROXIMITY_RADIUS = 6437;
                 cost = 4;
                 break;
             case ("5 miles4 (Very Expensive)"):
-                DIST = 5;
+                PROXIMITY_RADIUS = 8047;
                 cost = 4;
                 break;
         }
-
     }
 
     private void init() {
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } catch (NullPointerException e) {
             }
             currentlatlng = mPlace.getLatLng();
-            moveCameraZoom(currentlatlng, DEFAULT_ZOOM);
+            moveCameraZoom(currentlatlng, DEFAULT_ZOOM, null);
             places.release();
         }
     };
@@ -281,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful()) {
                             Location currentLocation = (Location) task.getResult();
                             currentlatlng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                            moveCameraZoom(currentlatlng, DEFAULT_ZOOM);
+                            moveCameraZoom(currentlatlng, DEFAULT_ZOOM,null);
                             loadNearByPlaces(currentlatlng.latitude, currentlatlng.longitude);
                         } else {
                             Toast.makeText(MainActivity.this, "Unable to get current location.", Toast.LENGTH_SHORT).show();
@@ -293,8 +294,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void moveCameraZoom(LatLng latLng, float zoom) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+    private void moveCameraZoom(LatLng latLng, float zoom, Circle circle) {
+        int zoomLevel = 11;
+        if(circle != null){
+            double radius = circle.getRadius() + circle.getRadius() / 2;
+            double scale = radius / 500;
+            zoomLevel = (int) (16 - Math.log(scale) / Math.log(2));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+        }else{
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+        }
         MarkerOptions options = new MarkerOptions().position(latLng).title("Current Location");
         mMap.addMarker(options);
     }
@@ -304,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void loadNearByPlaces(double latitude, double longitude) {
+
 
         String type = "restaurant";
         StringBuilder restaurantUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
@@ -334,9 +344,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private void parseLocationResult(JSONObject result) {
-        String place_id, placeAddress = "", placeName = null, placeLocationBias = null;
+        String place_id, placeAddress = "", placeName = null;
         double placeRating = 0, placeDistance, placePrice = 0;
         double latitude, longitude;
+        int counter =0;
 
         try {
             JSONArray jsonArray = result.getJSONArray("results");
@@ -349,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
-
+                    System.out.println("Before " + counter++);
                     place_id = place.getString(PLACE_ID);
 
                     if (!place.isNull(NAME)) {
@@ -358,15 +369,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (!place.isNull(RATING)) {
                         placeRating = place.getDouble(RATING);
                     }
-                    if (!place.isNull(PRICE)){
-                        placePrice = place.getInt(PRICE);
-                    }
                     if (!place.isNull(VICINITY)) {
                         placeAddress = place.getString(VICINITY);
                     }
-                    if (!place.isNull(LOCATION_BIAS)){
-                        placeLocationBias = place.getString(LOCATION_BIAS);
+                    if (!place.isNull(PRICE)){
+                        placePrice = place.getInt(PRICE);
+                    }else{
+                        continue;
                     }
+                    if(place.getInt(PRICE) != cost){
+                        continue;
+                    }
+                    System.out.println("After " + counter);
+
 
                     latitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LATITUDE);
                     longitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LONGITUDE);
@@ -382,26 +397,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     placeDistance = (R * c) / 1.609344; // Distance in km
 
                     PlaceData places = new PlaceData(placeName, placeAddress, place_id, placeRating, latLng, placeDistance, (int) placePrice);
-                    if(placeDistance <= DIST && placePrice == cost)
-                        restaurants.addPlace(places);
+                    restaurants.addPlace(places);
 
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng);
                     markerOptions.title(placeName);
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
-                    if(placeDistance <= DIST && placePrice == cost)
-                        mMap.addMarker(markerOptions);
-                    moveCameraZoom(currentlatlng, SHOWING_RESTAURANTS_ZOOM);
+                    mMap.addMarker(markerOptions);
                 }
-
-                Toast.makeText(getBaseContext(), jsonArray.length() + " restaurants found!", Toast.LENGTH_LONG).show();
+                Circle circle = mMap.addCircle( new CircleOptions()
+                        .radius(PROXIMITY_RADIUS).center(currentlatlng).strokeColor(Color.BLACK).fillColor(0x30ff0000)
+                );
+                moveCameraZoom(currentlatlng, SHOWING_RESTAURANTS_ZOOM, circle);
+                Toast.makeText(getBaseContext(), restaurants.getPlaces().size() + " restaurants found!", Toast.LENGTH_LONG).show();
 
             } else if (result.getString(STATUS).equalsIgnoreCase(ZERO_RESULTS)) {
                 Toast.makeText(getBaseContext(), "No restaurants found in 2KM radius!",
                         Toast.LENGTH_LONG).show();
             }
-        } catch (JSONException e) {
+        } catch(JSONException e){
             e.printStackTrace();
         }
     }
