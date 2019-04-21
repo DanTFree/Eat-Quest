@@ -13,8 +13,9 @@ import android.widget.Toast;
 
 public class second extends AppCompatActivity {
     public Spinner spinner1, spinner2, spinner3;
-    private Button btnMap, btnList;
-
+    private Button btnMap;
+    private int x, y;
+    private String z;
 
 
 
@@ -31,8 +32,8 @@ public class second extends AppCompatActivity {
 
 
     public void addListenerOnSpinnerItemSelection() {
-        // spinner1 =  findViewById(R.id.spinner1);
-        //spinner1.setOnItemSelectedListener(new CustomOnItemSelectListener());
+        spinner1 =  findViewById(R.id.spinner1);
+        spinner1.setOnItemSelectedListener(new CustomOnItemSelectListener());
 
         spinner2 =  findViewById(R.id.spinner2);
         spinner2.setOnItemSelectedListener(new CustomOnItemSelectListener());
@@ -46,7 +47,7 @@ public class second extends AppCompatActivity {
     // get the selected dropdown list value
     public void addListenerOnButton() {
 
-        // spinner1 =  findViewById(R.id.spinner1);
+        spinner1 =  findViewById(R.id.spinner1);
 
         spinner2 =  findViewById(R.id.spinner2);
 
@@ -55,8 +56,6 @@ public class second extends AppCompatActivity {
 
         btnMap =  findViewById(R.id.btnMap);
 
-        btnList =  findViewById(R.id.btnList);
-
         btnMap.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -64,8 +63,8 @@ public class second extends AppCompatActivity {
 
 
                 Toast.makeText(second.this, "OnClickListener : " +
-//                                "\nSpinner 1 : " +
-//                                String.valueOf(spinner1.getSelectedItem()) +
+                                "\nSpinner 1 : " +
+                                String.valueOf(spinner1.getSelectedItem()) +
                                 "\nSpinner 2 : " +
                                 String.valueOf(spinner2.getSelectedItem()) +
                                 "\nSpinner 3 : " +
@@ -75,54 +74,20 @@ public class second extends AppCompatActivity {
 
                 if (v.getId() == btnMap.getId()) {
                     Intent intent = new Intent(second.this, MainActivity.class);
-                    intent.putExtra("data",
-                            // String.valueOf(String.valueOf(spinner1.getSelectedItem()))
-                            String.valueOf(String.valueOf(spinner2.getSelectedItem())) +
-                                    String.valueOf(String.valueOf(spinner3.getSelectedItem())));
+                    x = Integer.parseInt(spinner2.getSelectedItem().toString().substring(0,1));
+                    y = Integer.parseInt(spinner3.getSelectedItem().toString().substring(0,1));
+                    z = spinner1.getSelectedItem().toString();
+                    intent.putExtra("price", x);
+                    intent.putExtra("distance", y);
+                    intent.putExtra("cuisine", z);
                     startActivity(intent);
                 }
             }
-        });
-
-        btnList.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-
-
-                Toast.makeText(second.this, "OnClickListener : " +
-                                //   "\nSpinner 1 : "+
-                                // String.valueOf(spinner1.getSelectedItem())+
-                                "\nSpinner 2 : "+
-                                String.valueOf(spinner2.getSelectedItem())  +
-                                "\nSpinner 3 : "+
-                                String.valueOf(spinner3.getSelectedItem())
-                        ,Toast.LENGTH_SHORT).show();
-
-
-
-                if(v.getId() == btnList.getId()) {
-                    Intent intent = new Intent(second.this, RecyclerViewActivity.class);
-                    intent.putExtra("data",
-                            //     String.valueOf( String.valueOf(spinner1.getSelectedItem())+
-                            String.valueOf(spinner2.getSelectedItem())  +
-                                    String.valueOf(spinner3.getSelectedItem())
-                    );
-                    startActivity(intent);
-                }
-
-
-            }
-
         });
     }
 
     private class CustomOnItemSelectListener implements android.widget.AdapterView.OnItemSelectedListener {
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-            Toast.makeText(parent.getContext(),
-                    "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
-                    Toast.LENGTH_SHORT).show();
         }
 
         @Override

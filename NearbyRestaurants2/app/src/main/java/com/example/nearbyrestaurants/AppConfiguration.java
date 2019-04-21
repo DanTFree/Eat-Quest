@@ -12,7 +12,7 @@ public final class AppConfiguration {
     public static final String LOCATION = "location";
     public static final String LATITUDE = "lat";
     public static final String LONGITUDE = "lng";
-    public static final String VICINITY = "vicinity";
+    public static final String ADDRESS = "formatted_address";
     public static final String PRICE = "price_level";
 
 }

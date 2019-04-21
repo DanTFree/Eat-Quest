@@ -7,4 +7,5 @@ public interface PlaceDataList {
     void addPlace(PlaceData newPlace);
     List<PlaceData> sortDistance();
     List<PlaceData> sortRating();
+    List<PlaceData> sortPrice();
 }

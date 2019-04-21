@@ -10,8 +10,7 @@ public class PlaceData {
     private double rating;
     private LatLng latLng;
     private double distance;
-    private double price_level;
-    private String locationbias;
+    private int price_level;
 
 
 
@@ -39,10 +38,9 @@ public class PlaceData {
     public String getID(){
         return id;
     }
-    public double getPrice(){
+    public int getPrice(){
         return price_level;
     }
-    public String getLocationbias(){ return locationbias;}
 
 
     public PlaceData(String name, String address, String id, double rating, LatLng latLng, double distance, int price_level) {
@@ -53,7 +51,6 @@ public class PlaceData {
         this.latLng = latLng;
         this.distance = distance;
         this.price_level = price_level;
-        this.locationbias = locationbias;
 
     }
 
@@ -67,7 +64,6 @@ public class PlaceData {
                 ", latLng=" + latLng +
                 ", distance=" + distance +
                 ", price=" + price_level +
-                ", loctionbias" + locationbias+
                 '}';
     }
 }

@@ -3,7 +3,6 @@ package com.example.nearbyrestaurants;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -45,8 +44,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.SocketTimeoutException;
-
 import static com.example.nearbyrestaurants.AppConfiguration.GEOMETRY;
 import static com.example.nearbyrestaurants.AppConfiguration.LATITUDE;
 import static com.example.nearbyrestaurants.AppConfiguration.LOCATION;
@@ -56,7 +53,7 @@ import static com.example.nearbyrestaurants.AppConfiguration.OK;
 import static com.example.nearbyrestaurants.AppConfiguration.PLACE_ID;
 import static com.example.nearbyrestaurants.AppConfiguration.RATING;
 import static com.example.nearbyrestaurants.AppConfiguration.STATUS;
-import static com.example.nearbyrestaurants.AppConfiguration.VICINITY;
+import static com.example.nearbyrestaurants.AppConfiguration.ADDRESS;
 import static com.example.nearbyrestaurants.AppConfiguration.ZERO_RESULTS;
 import static com.example.nearbyrestaurants.AppConfiguration.PRICE;
 
@@ -74,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng currentlatlng;
     public PlaceDataList restaurants;
     public int PROXIMITY_RADIUS = 1609;
-    public int cost;
+    public int cost = 1;
+    public String cuisine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,90 +83,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         getListButton = (Button) findViewById(R.id.get_list);
         getLocationPermission();
         Bundle bundle = getIntent().getExtras();
-        String data = bundle.get("data").toString();
+        cost = bundle.getInt("price");
+        PROXIMITY_RADIUS = 1609 *(bundle.getInt("distance"));
+        cuisine = bundle.getString("cuisine");
 
-        switch(data){
-            case ("1 mile1 (Inexpensive)"):
-                PROXIMITY_RADIUS = 1609;
-                cost = 1;
-                break;
-            case ("2 miles1 (Inexpensive)"):
-                PROXIMITY_RADIUS = 3219;
-                cost = 1;
-                break;
-            case ("3 miles1 (Inexpensive)"):
-                PROXIMITY_RADIUS = 4828;
-                cost = 1;
-                break;
-            case ("4 miles1 (Inexpensive)"):
-                PROXIMITY_RADIUS = 6437;
-                cost = 1;
-                break;
-            case ("5 miles1 (Inexpensive)"):
-                PROXIMITY_RADIUS = 8047;
-                cost = 1;
-                break;
-            case ("1 mile2 (Moderate)"):
-                PROXIMITY_RADIUS = 1609;
-                cost = 2;
-                break;
-            case ("2 miles2 (Moderate)"):
-                PROXIMITY_RADIUS = 3219;
-                cost = 2;
-                break;
-            case ("3 miles2 (Moderate)"):
-                PROXIMITY_RADIUS = 4828;
-                cost = 2;
-                break;
-            case ("4 miles2 (Moderate)"):
-                PROXIMITY_RADIUS = 6437;
-                cost = 2;
-                break;
-            case ("5 miles2 (Moderate)"):
-                PROXIMITY_RADIUS = 8047;
-                cost = 2;
-                break;
-            case ("1 mile3 (Expensive)"):
-                PROXIMITY_RADIUS = 1609;
-                cost = 3;
-                break;
-            case ("2 miles3 (Expensive)"):
-                PROXIMITY_RADIUS = 3219;
-                cost = 3;
-                break;
-            case ("3 miles3 (Expensive)"):
-                PROXIMITY_RADIUS = 4828;
-                cost = 3;
-                break;
-            case ("4 miles3 (Expensive)"):
-                PROXIMITY_RADIUS = 6437;
-                cost = 3;
-                break;
-            case ("5 miles3 (Expensive)"):
-                PROXIMITY_RADIUS = 8047;
-                cost = 3;
-                break;
-            case ("1 mile4 (Very Expensive)"):
-                PROXIMITY_RADIUS = 1609;
-                cost = 4;
-                break;
-            case ("2 miles4 (Very Expensive)"):
-                PROXIMITY_RADIUS = 3219;
-                cost = 4;
-                break;
-            case ("3 miles4 (Very Expensive)"):
-                PROXIMITY_RADIUS = 4828;
-                cost = 4;
-                break;
-            case ("4 miles4 (Very Expensive)"):
-                PROXIMITY_RADIUS = 6437;
-                cost = 4;
-                break;
-            case ("5 miles4 (Very Expensive)"):
-                PROXIMITY_RADIUS = 8047;
-                cost = 4;
-                break;
-        }
     }
 
     private void init() {
@@ -186,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(i);
             }
         });
-
     }
 
     private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
@@ -295,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void moveCameraZoom(LatLng latLng, float zoom, Circle circle) {
-        int zoomLevel = 11;
+        int zoomLevel;
         if(circle != null){
             double radius = circle.getRadius() + circle.getRadius() / 2;
             double scale = radius / 500;
@@ -315,11 +232,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void loadNearByPlaces(double latitude, double longitude) {
 
 
-        String type = "restaurant";
-        StringBuilder restaurantUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        restaurantUrl.append("location=").append(latitude).append(",").append(longitude);
+        StringBuilder restaurantUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/textsearch/json?");
+        restaurantUrl.append("query=" + cuisine+ "+restaurant");
+        restaurantUrl.append("&location=").append(latitude).append(",").append(longitude);
         restaurantUrl.append("&radius=").append(PROXIMITY_RADIUS);
-        restaurantUrl.append("&types=").append(type);
+        restaurantUrl.append("&types=restaurant");
         restaurantUrl.append("&sensor=true");
         restaurantUrl.append("&key=" + getResources().getString(R.string.places_api_key));
 
@@ -345,9 +262,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void parseLocationResult(JSONObject result) {
         String place_id, placeAddress = "", placeName = null;
-        double placeRating = 0, placeDistance, placePrice = 0;
+        double placeRating = 0, placeDistance, placePrice;
         double latitude, longitude;
-        int counter =0;
 
         try {
             JSONArray jsonArray = result.getJSONArray("results");
@@ -360,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
-                    System.out.println("Before " + counter++);
+
                     place_id = place.getString(PLACE_ID);
 
                     if (!place.isNull(NAME)) {
@@ -369,18 +285,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (!place.isNull(RATING)) {
                         placeRating = place.getDouble(RATING);
                     }
-                    if (!place.isNull(VICINITY)) {
-                        placeAddress = place.getString(VICINITY);
+                    if (!place.isNull(ADDRESS)) {
+                        placeAddress = place.getString(ADDRESS);
                     }
                     if (!place.isNull(PRICE)){
                         placePrice = place.getInt(PRICE);
                     }else{
+                        placePrice = 0;
+                    }
+
+                    if(placePrice > cost){
                         continue;
                     }
-                    if(place.getInt(PRICE) != cost){
-                        continue;
-                    }
-                    System.out.println("After " + counter);
 
 
                     latitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LATITUDE);
@@ -394,6 +310,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     Math.cos(latitude * (Math.PI / 180)) * Math.cos(currentlatlng.latitude * (Math.PI / 180)) *
                                             Math.sin(dLon / 2) * Math.sin(dLon / 2);
                     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    if(((R*c) * 1000)> PROXIMITY_RADIUS){
+                        continue;
+                    }
                     placeDistance = (R * c) / 1.609344; // Distance in km
 
                     PlaceData places = new PlaceData(placeName, placeAddress, place_id, placeRating, latLng, placeDistance, (int) placePrice);
