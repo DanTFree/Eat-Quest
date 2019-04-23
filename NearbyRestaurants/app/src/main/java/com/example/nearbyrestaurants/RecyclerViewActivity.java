@@ -14,6 +14,7 @@ import com.example.nearbyrestaurants.PlaceModels.PlaceDataList;
 public class RecyclerViewActivity extends AppCompatActivity {
     private Button ratingSortButton;
     private Button distanceSortButton;
+    private Button priceSortButton;
     public PlaceDataList restaurants;
 
     @Override
@@ -23,6 +24,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
         restaurants = ListImplementation.sharedInstance();
         ratingSortButton = (Button) findViewById(R.id.get_list_sort_rating);
         distanceSortButton = (Button) findViewById(R.id.get_list_sort_distance);
+        priceSortButton = (Button) findViewById(R.id.get_list_sort_price);
         initRecyclerView();
     }
 
@@ -50,6 +52,12 @@ public class RecyclerViewActivity extends AppCompatActivity {
                 sortByRating();
             }
         });
+        priceSortButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                sortByPrice();
+            }
+        });
     }
 
     private void sortByRating(){
@@ -69,6 +77,21 @@ public class RecyclerViewActivity extends AppCompatActivity {
     }
     private void sortByDistance(){
         restaurants.sortDistance();
+        RecyclerView myRecycler = findViewById(R.id.recyclerview);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter();
+        myRecycler.setAdapter(adapter);
+        myRecycler.setLayoutManager(new LinearLayoutManager(this));
+        adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(getBaseContext(), InfoActivity.class);
+                intent.putExtra("itemPosition", position);
+                startActivity(intent);
+            }
+        });
+    }
+    private void sortByPrice(){
+        restaurants.sortPrice();
         RecyclerView myRecycler = findViewById(R.id.recyclerview);
         RecyclerViewAdapter adapter = new RecyclerViewAdapter();
         myRecycler.setAdapter(adapter);

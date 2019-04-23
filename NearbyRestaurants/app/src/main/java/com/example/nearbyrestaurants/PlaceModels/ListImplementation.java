@@ -34,6 +34,7 @@ public class ListImplementation implements PlaceDataList {
         restaurantList.sort(new Comparator<PlaceData>() {
             @Override
             public int compare(PlaceData o1, PlaceData o2) {
+                //if distance 1 is more than distance 2, then place it on bottom.
                 if(o1.getDistance() > o2.getDistance()){return 1;}
                 if(o1.getDistance() < o2.getDistance()){return -1;}
                 return 0;
@@ -48,6 +49,18 @@ public class ListImplementation implements PlaceDataList {
             public int compare(PlaceData o1, PlaceData o2) {
                 if(o1.getRating() > o2.getRating()){return -1;}
                 if(o1.getRating() < o2.getRating()){return 1;}
+                return 0;
+            }
+        });
+        return restaurantList;
+    }
+    @Override
+    public List<PlaceData> sortPrice(){
+        restaurantList.sort(new Comparator<PlaceData>() {
+            @Override
+            public int compare(PlaceData o1, PlaceData o2) {
+                if(o1.getPrice() > o2.getPrice()){return 1;}
+                if(o1.getPrice() < o2.getPrice()){return -1;}
                 return 0;
             }
         });

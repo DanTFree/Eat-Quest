@@ -3,7 +3,7 @@ package com.example.nearbyrestaurants;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -33,6 +33,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -51,13 +53,15 @@ import static com.example.nearbyrestaurants.AppConfiguration.OK;
 import static com.example.nearbyrestaurants.AppConfiguration.PLACE_ID;
 import static com.example.nearbyrestaurants.AppConfiguration.RATING;
 import static com.example.nearbyrestaurants.AppConfiguration.STATUS;
-import static com.example.nearbyrestaurants.AppConfiguration.VICINITY;
+import static com.example.nearbyrestaurants.AppConfiguration.ADDRESS;
 import static com.example.nearbyrestaurants.AppConfiguration.ZERO_RESULTS;
+import static com.example.nearbyrestaurants.AppConfiguration.PRICE;
+
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 123;
     private static final float DEFAULT_ZOOM = 15f;
-    private static final float SHOWING_RESTAURANTS_ZOOM = 14f;
+    public float SHOWING_RESTAURANTS_ZOOM = 14f;
     private boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GoogleMap mMap;
@@ -66,7 +70,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private PlaceData mPlace;
     private LatLng currentlatlng;
     public PlaceDataList restaurants;
-    private int PROXIMITY_RADIUS = 1600;
+    public int PROXIMITY_RADIUS = 1609;
+    public int cost = 1;
+    public String cuisine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +82,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGPS = (ImageView) findViewById(R.id.gps);
         getListButton = (Button) findViewById(R.id.get_list);
         getLocationPermission();
+        Bundle bundle = getIntent().getExtras();
+        cost = bundle.getInt("price");
+        PROXIMITY_RADIUS = 1609 *(bundle.getInt("distance"));
+        cuisine = bundle.getString("cuisine");
+
     }
 
     private void init() {
@@ -93,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(i);
             }
         });
-
     }
 
     private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
@@ -106,12 +116,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             final Place place = places.get(0);
             try {
                 mPlace = new PlaceData(place.getName().toString(), place.getAddress().toString(),
-                        place.getId().toString(), place.getRating(), place.getLatLng(), 0);
+                        place.getId().toString(), place.getRating(), place.getLatLng(), 0, place.getPriceLevel());
 
             } catch (NullPointerException e) {
             }
             currentlatlng = mPlace.getLatLng();
-            moveCameraZoom(currentlatlng, DEFAULT_ZOOM);
+            moveCameraZoom(currentlatlng, DEFAULT_ZOOM, null);
             places.release();
         }
     };
@@ -189,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful()) {
                             Location currentLocation = (Location) task.getResult();
                             currentlatlng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                            moveCameraZoom(currentlatlng, DEFAULT_ZOOM);
+                            moveCameraZoom(currentlatlng, DEFAULT_ZOOM,null);
                             loadNearByPlaces(currentlatlng.latitude, currentlatlng.longitude);
                         } else {
                             Toast.makeText(MainActivity.this, "Unable to get current location.", Toast.LENGTH_SHORT).show();
@@ -201,8 +211,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void moveCameraZoom(LatLng latLng, float zoom) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+    private void moveCameraZoom(LatLng latLng, float zoom, Circle circle) {
+        int zoomLevel;
+        if(circle != null){
+            double radius = circle.getRadius() + circle.getRadius() / 2;
+            double scale = radius / 500;
+            zoomLevel = (int) (16 - Math.log(scale) / Math.log(2));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+        }else{
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+        }
         MarkerOptions options = new MarkerOptions().position(latLng).title("Current Location");
         mMap.addMarker(options);
     }
@@ -213,11 +231,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void loadNearByPlaces(double latitude, double longitude) {
 
-        String type = "restaurant";
-        StringBuilder restaurantUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        restaurantUrl.append("location=").append(latitude).append(",").append(longitude);
+
+        StringBuilder restaurantUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/textsearch/json?");
+        restaurantUrl.append("query=" + cuisine+ "+restaurant");
+        restaurantUrl.append("&location=").append(latitude).append(",").append(longitude);
         restaurantUrl.append("&radius=").append(PROXIMITY_RADIUS);
-        restaurantUrl.append("&types=").append(type);
+        restaurantUrl.append("&types=restaurant");
         restaurantUrl.append("&sensor=true");
         restaurantUrl.append("&key=" + getResources().getString(R.string.places_api_key));
 
@@ -243,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void parseLocationResult(JSONObject result) {
         String place_id, placeAddress = "", placeName = null;
-        double placeRating = 0, placeDistance;
+        double placeRating = 0, placeDistance, placePrice;
         double latitude, longitude;
 
         try {
@@ -266,9 +285,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (!place.isNull(RATING)) {
                         placeRating = place.getDouble(RATING);
                     }
-                    if (!place.isNull(VICINITY)) {
-                        placeAddress = place.getString(VICINITY);
+                    if (!place.isNull(ADDRESS)) {
+                        placeAddress = place.getString(ADDRESS);
                     }
+                    if (!place.isNull(PRICE)){
+                        placePrice = place.getInt(PRICE);
+                    }else{
+                        placePrice = 0;
+                    }
+
+                    if(placePrice > cost){
+                        continue;
+                    }
+
+
                     latitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LATITUDE);
                     longitude = place.getJSONObject(GEOMETRY).getJSONObject(LOCATION).getDouble(LONGITUDE);
                     LatLng latLng = new LatLng(latitude, longitude);
@@ -280,9 +310,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     Math.cos(latitude * (Math.PI / 180)) * Math.cos(currentlatlng.latitude * (Math.PI / 180)) *
                                             Math.sin(dLon / 2) * Math.sin(dLon / 2);
                     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    if(((R*c) * 1000)> PROXIMITY_RADIUS){
+                        continue;
+                    }
                     placeDistance = (R * c) / 1.609344; // Distance in km
 
-                    PlaceData places = new PlaceData(placeName, placeAddress, place_id, placeRating, latLng, placeDistance);
+                    PlaceData places = new PlaceData(placeName, placeAddress, place_id, placeRating, latLng, placeDistance, (int) placePrice);
                     restaurants.addPlace(places);
 
                     MarkerOptions markerOptions = new MarkerOptions();
@@ -291,16 +324,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
                     mMap.addMarker(markerOptions);
-                    moveCameraZoom(currentlatlng, SHOWING_RESTAURANTS_ZOOM);
                 }
-
-                Toast.makeText(getBaseContext(), jsonArray.length() + " restaurants found!", Toast.LENGTH_LONG).show();
+                Circle circle = mMap.addCircle( new CircleOptions()
+                        .radius(PROXIMITY_RADIUS).center(currentlatlng).strokeColor(Color.BLACK).fillColor(0x30ff0000)
+                );
+                moveCameraZoom(currentlatlng, SHOWING_RESTAURANTS_ZOOM, circle);
+                Toast.makeText(getBaseContext(), restaurants.getPlaces().size() + " restaurants found!", Toast.LENGTH_LONG).show();
 
             } else if (result.getString(STATUS).equalsIgnoreCase(ZERO_RESULTS)) {
                 Toast.makeText(getBaseContext(), "No restaurants found in 2KM radius!",
                         Toast.LENGTH_LONG).show();
             }
-        } catch (JSONException e) {
+        } catch(JSONException e){
             e.printStackTrace();
         }
     }

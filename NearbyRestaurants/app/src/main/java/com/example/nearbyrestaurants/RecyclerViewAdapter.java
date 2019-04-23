@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 
@@ -46,6 +45,20 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
             String distance = String.format("%.2f", restaurants.getPlaces().get(position).getDistance());
             holder.RestaurantRating.setText("Rating " + rating + "/5");
             holder.RestaurantDistance.setText(distance + " Miles");
+            int price =  restaurants.getPlaces().get(position).getPrice();
+            if(price == 0){
+                holder.RestaurantPrice.setText("N/A");
+            } else if(price == 1){
+                holder.RestaurantPrice.setText("$");
+            }else if(price == 2){
+                holder.RestaurantPrice.setText("$$");
+            }else if(price == 3){
+                holder.RestaurantPrice.setText("$$$");
+            }else{
+                holder.RestaurantPrice.setText("$$$$");
+            }
+
+
         } catch (NullPointerException e) {
         }
     }
@@ -54,6 +67,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
         TextView RestaurantName;
         TextView RestaurantRating;
         TextView RestaurantDistance;
+        TextView RestaurantPrice;
 
 
         public ViewHolder(View itemView, final OnItemClickListener listener) {
@@ -61,6 +75,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
             RestaurantName = (TextView) itemView.findViewById(R.id.restaurantName);
             RestaurantRating = (TextView) itemView.findViewById(R.id.restaurant_rating);
             RestaurantDistance = (TextView) itemView.findViewById(R.id.restaurant_distance);
+            RestaurantPrice = (TextView) itemView.findViewById(R.id.restaurant_price);
 
             itemView.setOnClickListener(new View.OnClickListener(){
                 @Override

@@ -48,18 +48,16 @@ public class InfoActivity extends AppCompatActivity {
 
         loadDetails();
 
-
-
     }
 
     private void loadDetails(){
         Intent mIntent = getIntent();
         int positionNumb = mIntent.getIntExtra("itemPosition", 0);
 
-        //https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJ5V-QXKiwj4ARv5e-BSB9fiA&fields=formatted_phone_number,photo&key=AIzaSyCEpLRjoupchPtJoXt9Wd50OXWRtkQ4Fgk
+        //https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJ5V-QXKiwj4ARv5e-BSB9fiA&fields=formatted_phone_number,photo,address_component&key=AIzaSyCEpLRjoupchPtJoXt9Wd50OXWRtkQ4Fgk
         StringBuilder restaurantUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
         restaurantUrl.append("placeid=" +restaurants.getPlaces().get(positionNumb).getID());
-        restaurantUrl.append("&fields=formatted_phone_number,photo");
+        restaurantUrl.append("&fields=formatted_phone_number,photo,address_component");
         restaurantUrl.append("&key=AIzaSyCEpLRjoupchPtJoXt9Wd50OXWRtkQ4Fgk");
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, restaurantUrl.toString(), (String)null,
@@ -84,8 +82,8 @@ public class InfoActivity extends AppCompatActivity {
     }
 
     private void jsonParse(JSONObject result) {
-        String phoneNumber = "N/A";
-        String photoRef = "N/A";
+        String phoneNumber;
+        String photoRef;
         try {
 
 
@@ -96,6 +94,7 @@ public class InfoActivity extends AppCompatActivity {
                     restPhone = (TextView) findViewById(R.id.rest_phone);
                     restPhone.setText(phoneNumber);
                 }
+
                 JSONArray jPhotoArray = jObj.getJSONArray("photos");
                 JSONObject jPhoto = jPhotoArray.getJSONObject(0);
                     photoRef = jPhoto.getString("photo_reference");
